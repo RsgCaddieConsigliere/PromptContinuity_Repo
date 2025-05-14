@@ -1,3 +1,6 @@
 [submodule "external/openai-cookbook"]
 	path = external/openai-cookbook
 	url = https://github.com/openai/openai-cookbook.git
+[submodule "external/PromptPapers"]
+	path = external/PromptPapers
+	url = https://github.com/thunlp/PromptPapers.git
