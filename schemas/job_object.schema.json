@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Cross-AI Job Object",
+  "type": "object",
+  "required": ["job_id", "project_id", "objective", "status", "writer_platform", "hitl_gate"],
+  "properties": {
+    "job_id": {"type": "string"},
+    "project_id": {"type": "string"},
+    "issue_id": {"type": ["string", "null"]},
+    "objective": {"type": "string"},
+    "input_refs": {"type": "array", "items": {"type": "string"}},
+    "source_freeze_id": {"type": ["string", "null"]},
+    "dependencies": {"type": "array", "items": {"type": "string"}},
+    "writer_platform": {"type": "string"},
+    "reviewer_platform": {"type": ["string", "null"]},
+    "allowed_operations": {"type": "array", "items": {"type": "string"}},
+    "prohibited_operations": {"type": "array", "items": {"type": "string"}},
+    "verification_gate": {"type": ["string", "null"]},
+    "hitl_gate": {"type": "string"},
+    "status": {"type": "string"},
+    "output_refs": {"type": "array", "items": {"type": "string"}},
+    "exception_count": {"type": "integer", "minimum": 0}
+  }
+}
