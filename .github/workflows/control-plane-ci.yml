@@ -1,0 +1,39 @@
+name: Control Plane CI
+
+on:
+  push:
+    paths:
+      - 'automation/file_sandbox/**'
+      - 'schemas/**'
+      - '.github/workflows/control-plane-ci.yml'
+  pull_request:
+    paths:
+      - 'automation/file_sandbox/**'
+      - 'schemas/**'
+      - '.github/workflows/control-plane-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile Python helpers
+        run: python -m compileall -q automation/file_sandbox
+      - name: Run sandbox regression tests
+        run: python -m unittest discover -s automation/file_sandbox/tests -p 'test_*.py' -v
+      - name: Validate JSON schemas parse
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in Path('schemas').glob('*.json'):
+              json.loads(path.read_text(encoding='utf-8'))
+              print('OK', path)
+          PY
