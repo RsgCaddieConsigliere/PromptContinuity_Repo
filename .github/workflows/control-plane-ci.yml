@@ -5,11 +5,13 @@ on:
     paths:
       - 'automation/file_sandbox/**'
       - 'schemas/**'
+      - 'docs/**'
       - '.github/workflows/control-plane-ci.yml'
   pull_request:
     paths:
       - 'automation/file_sandbox/**'
       - 'schemas/**'
+      - 'docs/**'
       - '.github/workflows/control-plane-ci.yml'
   workflow_dispatch:
 
@@ -20,8 +22,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
       - name: Compile Python helpers
@@ -36,4 +38,43 @@ jobs:
           for path in Path('schemas').glob('*.json'):
               json.loads(path.read_text(encoding='utf-8'))
               print('OK', path)
+          PY
+      - name: Guard public control plane from private workspace identifiers
+        run: |
+          python - <<'PY'
+          import re
+          import subprocess
+          from pathlib import Path
+
+          tracked = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+          text_suffixes = {'.md', '.txt', '.json', '.jsonl', '.yaml', '.yml', '.py', '.sh'}
+          live_private_link = re.compile(
+              r'https://(?:drive\.google\.com/(?:file/d|drive/folders)/|'
+              r'docs\.google\.com/(?:document|spreadsheets|presentation)/d/)'
+              r'[A-Za-z0-9_-]{20,}'
+          )
+          forbidden_suffixes = {'.pem', '.key', '.p12', '.pfx'}
+          forbidden_names = {'.env', '.env.local', '.env.production', '.env.development'}
+          problems = []
+
+          for raw in tracked:
+              path = Path(raw)
+              if path.name in forbidden_names or path.suffix.lower() in forbidden_suffixes:
+                  problems.append(f'forbidden tracked secret-bearing file type: {raw}')
+                  continue
+              if path.suffix.lower() not in text_suffixes:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              if live_private_link.search(text):
+                  problems.append(f'live Google workspace/Drive identifier in public control plane: {raw}')
+              if '-----BEGIN PRIVATE KEY-----' in text or '-----BEGIN RSA PRIVATE KEY-----' in text:
+                  problems.append(f'private key material detected: {raw}')
+
+          if problems:
+              print('\n'.join(f'ERROR: {p}' for p in problems))
+              raise SystemExit(1)
+          print('OK public-control-plane guard')
           PY
