@@ -55,6 +55,8 @@ jobs:
           )
           forbidden_suffixes = {'.pem', '.key', '.p12', '.pfx'}
           forbidden_names = {'.env', '.env.local', '.env.production', '.env.development'}
+          private_key_marker = '-----BEGIN ' + 'PRIVATE KEY-----'
+          rsa_key_marker = '-----BEGIN RSA ' + 'PRIVATE KEY-----'
           problems = []
 
           for raw in tracked:
@@ -70,7 +72,7 @@ jobs:
                   continue
               if live_private_link.search(text):
                   problems.append(f'live Google workspace/Drive identifier in public control plane: {raw}')
-              if '-----BEGIN PRIVATE KEY-----' in text or '-----BEGIN RSA PRIVATE KEY-----' in text:
+              if private_key_marker in text or rsa_key_marker in text:
                   problems.append(f'private key material detected: {raw}')
 
           if problems:
