@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Asset Identity Record",
+  "type": "object",
+  "required": ["asset_key", "sha256", "bytes", "original_relative_path", "source_mode"],
+  "properties": {
+    "asset_key": {"type": "string", "description": "Content-addressable asset key, e.g. ASSET-SHA256-<prefix>. Not a semantic SRC ID."},
+    "src_id": {"type": ["string", "null"]},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "bytes": {"type": "integer", "minimum": 0},
+    "original_relative_path": {"type": "string"},
+    "original_filename": {"type": "string"},
+    "canonical_filename": {"type": ["string", "null"]},
+    "mime_guess": {"type": ["string", "null"]},
+    "source_mode": {"enum": ["BLOB_NATIVE", "GOOGLE_NATIVE_LIVE", "GOOGLE_NATIVE_SNAPSHOT", "DERIVATIVE"]},
+    "parent_src_id": {"type": ["string", "null"]},
+    "drive_file_id": {"type": ["string", "null"]},
+    "drive_revision_id": {"type": ["string", "null"]},
+    "modified_time": {"type": ["string", "null"]},
+    "lock_status": {"type": "string"}
+  }
+}
