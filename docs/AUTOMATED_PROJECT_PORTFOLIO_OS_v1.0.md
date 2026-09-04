@@ -120,6 +120,37 @@ Measure: unchanged-file skip rate, extraction-cache hit rate, duplicate bytes av
 
 Maintain small golden regression cases for critical invariants such as hash/dedup, moved-file detection, quote-lock prerequisites, and project COMPLETE prerequisites.
 
+## Data governance and public-repository admission
+
+Governance must reduce execution friction rather than create a parallel approval system. Use the minimum rule set needed to prevent leakage or source contamination.
+
+### Data classes
+
+- **G0 — PUBLIC / GENERIC:** reusable schemas, generic prompts, validators, public documentation, tests, and generic automation. May enter the public GitHub control plane after validation.
+- **G1 — PRIVATE PROJECT METADATA:** matter-specific IDs, private names, cloud file IDs, task/worker state, deadlines, and internal routing. Keep in approved private execution storage; do not publish to public GitHub.
+- **G2 — SOURCE / EVIDENCE:** native official/evidentiary records, attachments, frozen snapshots, and exhibit material. Keep in private source storage/source packs with provenance controls; never replace the only native source with a derivative.
+- **G3 — RESTRICTED / PRIVILEGED / SECRET:** credentials, keys, privileged communications, highly sensitive personal information, and narrowly controlled disclosure material. Minimum-necessary access only; never publish to the public control repo.
+
+### Public GitHub gate
+
+The public control repository accepts **G0 only**. Public examples use placeholders rather than live private Drive/Docs/Sheets/Slides IDs. Repository automation should fail closed on detected live private cloud links, private-key material, or tracked secret-bearing file types.
+
+### Execution defaults
+
+- Reversible ambiguity -> safest provisional route + review candidate -> continue.
+- Material conflict, confidentiality issue, irreversible action, unsupported factual promotion, consequential professional judgment, or external disclosure -> exception/HITL.
+- One writer per active job; reviewers consume immutable snapshots/manifests.
+- Patch verified work rather than regenerating whole artifacts.
+- Stop when acceptance tests pass and no material gap remains.
+
+### GitHub change control
+
+- Prefer short-lived branches and pull requests for control-plane changes.
+- Keep GitHub Actions permissions at least privilege; read-only is the default.
+- Pin third-party GitHub Actions to immutable full commit SHAs.
+- Require relevant CI/status checks before protected-branch merges when repository settings permit.
+- Keep project evidence, private Drive IDs, private worker outputs, and case-specific state out of the public repository.
+
 ## Rollout
 
 1. Version schemas/scripts in GitHub; keep evidence out of the public repository.
