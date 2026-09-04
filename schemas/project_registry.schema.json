@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project Portfolio Record",
+  "type": "object",
+  "required": ["project_id", "project_name", "status", "target_outcome", "next_action", "completion_gate_status"],
+  "properties": {
+    "project_id": {"type": "string"},
+    "project_name": {"type": "string"},
+    "domain": {"type": ["string", "null"]},
+    "status": {"type": "string"},
+    "target_outcome": {"type": "string"},
+    "completion_contract_path": {"type": ["string", "null"]},
+    "current_source_freeze_id": {"type": ["string", "null"]},
+    "next_action": {"type": "string"},
+    "next_best_platform": {"type": ["string", "null"]},
+    "automation_mode": {"type": ["string", "null"]},
+    "completion_gate_status": {"type": "string"},
+    "blockers": {"type": "array", "items": {"type": "string"}}
+  }
+}
