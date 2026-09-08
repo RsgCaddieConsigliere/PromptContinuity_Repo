@@ -1,21 +1,33 @@
-# Validation Status — corpus-reconcile v0.1.1
+# Validation Status — corpus-reconcile v0.1.2
 
-## Current status
+## Historical validation
 
 - The original pre-amendment v0.1 local regression suite executed successfully at 7/7 before the G0-G5 amendment.
-- The G0-G5 / identity amendment expands the current suite to 12 tests.
-- The v0.1.1 patch was applied and statically read back through GitHub connectors.
-- The existing `Control Plane CI` workflow was extended to install, compile, and test `corpus_reconcile_v0_1` whenever this implementation changes.
-- GitHub Actions run `34199502357` for commit `95048fff43c9024bd4b9127251fed7088efb2485` completed successfully.
-- The workflow job completed successfully, including `Install corpus-reconcile test dependencies`, `Compile corpus-reconcile package`, and `Run corpus-reconcile regression tests`.
+- The G0-G5 / identity amendment expanded the suite to 12 tests in v0.1.1.
+- GitHub Actions run `34199502357` for commit `95048fff43c9024bd4b9127251fed7088efb2485` completed successfully, including package installation, compile, and the corpus-reconcile regression-test step.
+- GitHub Actions run `34199654951` subsequently completed successfully on the accepted v0.1.1 current-head documentation state.
 
-The predecessor 7/7 result therefore remains historical context only; current v0.1.1 validation is established by the amended GitHub Actions regression-test step.
+These results are historical validation for v0.1.1 and do not substitute for validation of later code changes.
 
-## Current release gate
+## v0.1.2 iteration-2 delta
 
-Code-validation is no longer a blocker for the read-only filesystem pilot. The next authorized execution is the Cowork FULL-ROOT READ-ONLY census using the accepted v0.1.1 branch state, with explicit `ROOT_ID`, unique `RUN_ID`, parent-controlled `RUN_SEED`, and prior instance/sticky-protection registry.
+v0.1.2 adds guarded single-byte-stream handling for special parsers:
 
-Cowork must preserve the command/configuration, implementation commit SHA, output directory, and generated manifests as run evidence. A local smoke re-run of the test suite is optional environment confirmation, not a prerequisite to begin the read-only census.
+- EML headers, raw MIME SHA-256, and attachment hashes are bound to one guarded byte observation.
+- ZIP container SHA-256 and member hashes are bound to one guarded byte observation.
+- The regression suite is expanded from 12 to 14 tests to cover those invariants.
+
+## Current validation state
+
+The v0.1.2 implementation is **PENDING CURRENT-HEAD CI** until the existing `Control Plane CI` workflow completes successfully on the final v0.1.2 branch head.
+
+Do not direct Cowork to a v0.1.2 census until that current-head run succeeds. The previously validated v0.1.1 head remains the last validated execution baseline until then.
+
+## Release gate after v0.1.2 CI success
+
+Once current-head CI passes, the next authorized execution is still only the Cowork FULL-ROOT READ-ONLY census with explicit `ROOT_ID`, unique `RUN_ID`, parent-controlled `RUN_SEED`, and prior instance/sticky-protection registry.
+
+Cowork must preserve its configuration, implementation commit SHA, output directory, and generated manifests as run evidence. A local smoke re-run of the test suite is optional environment confirmation after GitHub CI passes.
 
 ## Required gate before mutation canary
 
@@ -28,4 +40,4 @@ Cowork must preserve the command/configuration, implementation commit SHA, outpu
 7. canary is limited to 3-5 eligible mutable work products/derivatives;
 8. post-operation readback/fixity and idempotency rerun pass.
 
-No mutation authority is granted by the CI pass. PR #2 remains draft and should remain unmerged until the bounded live read-only pilot and subsequent release gates are reviewed.
+No mutation authority is granted by CI. PR #2 remains draft and should remain unmerged until the bounded live read-only pilot and subsequent release gates are reviewed.
