@@ -6,8 +6,10 @@ from pathlib import PurePosixPath
 
 
 def normalize_relative_path(value: str) -> str:
-    """Return a stable POSIX-style relative path without resolving the filesystem."""
-    text = value.replace("\\", "/").lstrip("./")
+    """Return a stable POSIX-style relative path without resolving or hiding `..`."""
+    text = value.replace("\\", "/")
+    while text.startswith("./"):
+        text = text[2:]
     return str(PurePosixPath(text))
 
 
