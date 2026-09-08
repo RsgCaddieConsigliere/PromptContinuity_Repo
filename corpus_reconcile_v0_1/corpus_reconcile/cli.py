@@ -1,27 +1,67 @@
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import json
+from pathlib import Path
+
+from .email_parser import parse_eml
 from .inventory import inventory_local
 from .reconcile import exact_duplicate_relationships
-from .email_parser import parse_eml
 from .zip_manifest import zip_manifest
 
+
+def _load_registry(path: str | None) -> dict:
+    if not path:
+        return {}
+    with Path(path).open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if isinstance(data, list):
+        return {row["current_relative_path"]: row for row in data}
+    if isinstance(data, dict):
+        return data
+    raise ValueError("instance registry must be a JSON object or list of instance rows")
+
+
 def main():
-    p = argparse.ArgumentParser(prog="corpus-reconcile")
-    sub = p.add_subparsers(required=True)
-    a = sub.add_parser("inventory")
-    a.add_argument("root"); a.add_argument("--matter", default="PILOT")
-    e = sub.add_parser("parse-eml"); e.add_argument("path")
-    z = sub.add_parser("zip-manifest"); z.add_argument("path")
-    args = p.parse_args()
-    if args.__dict__.get("root"):
-        rows = inventory_local(args.root, args.matter)
+    parser = argparse.ArgumentParser(prog="corpus-reconcile")
+    sub = parser.add_subparsers(required=True)
+
+    inventory = sub.add_parser("inventory")
+    inventory.add_argument("root")
+    inventory.add_argument("--matter", default="PILOT")
+    inventory.add_argument("--root-id", default="LOCAL-PILOT", help="Stable parent-controlled corpus root ID; explicit value required for production runs")
+    inventory.add_argument("--run-id", default="RUN-LOCAL", help="Unique append-only run ID; explicit value required for production runs")
+    inventory.add_argument("--instance-registry", help="JSON registry keyed by current_relative_path or list of prior file-instance rows")
+
+    eml = sub.add_parser("parse-eml")
+    eml.add_argument("path")
+
+    zip_cmd = sub.add_parser("zip-manifest")
+    zip_cmd.add_argument("path")
+
+    args = parser.parse_args()
+    if hasattr(args, "root"):
+        rows = inventory_local(
+            args.root,
+            args.matter,
+            root_id=args.root_id,
+            run_id=args.run_id,
+            instance_registry=_load_registry(args.instance_registry),
+        )
         rels, families = exact_duplicate_relationships(rows)
-        out = {"source_objects": rows, "relationships": rels, "duplicate_families": families}
-    elif getattr(args, "path", None) and args.path.lower().endswith(".eml"):
+        out = {
+            "run_id": args.run_id,
+            "root_id": args.root_id,
+            "source_objects": rows,
+            "relationships": rels,
+            "duplicate_families": families,
+        }
+    elif args.path.lower().endswith(".eml"):
         out = parse_eml(args.path)
     else:
         out = zip_manifest(args.path)
     print(json.dumps(out, indent=2))
+
 
 if __name__ == "__main__":
     main()
