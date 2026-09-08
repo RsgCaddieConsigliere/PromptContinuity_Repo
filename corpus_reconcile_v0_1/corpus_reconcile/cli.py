@@ -36,6 +36,7 @@ def _instance_rows(rows: list[dict]) -> list[dict]:
             "root_id": row["root_id"],
             "original_relative_path": row["original_relative_path"],
             "original_filename": row["original_name"],
+            "first_observed_run_id": row["first_observed_run_id"],
             "current_relative_path": row["current_relative_path"],
             "protection_class": row["protection_class"],
             "sticky_protection_source": row["sticky_protection_source"],
