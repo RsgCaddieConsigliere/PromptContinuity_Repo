@@ -7,6 +7,7 @@ from corpus_reconcile.inventory import inventory_local
 from corpus_reconcile.naming import propose_name
 from corpus_reconcile.planner import make_transaction, mutation_eligibility
 from corpus_reconcile.reconcile import exact_duplicate_relationships
+from corpus_reconcile.sampling import stratified_sample
 from corpus_reconcile.state_machine import Transaction, validate_action
 from corpus_reconcile.zip_manifest import zip_manifest
 
@@ -102,6 +103,19 @@ def test_exact_duplicates_do_not_auto_select_canonical():
     assert len(fams) == 1 and len(rels) == 1
     assert fams[0]["canonical_src_id"] is None
     assert rels[0]["certainty"] == "CONFIRMED"
+
+
+def test_stratified_sample_is_deterministic_and_diverse():
+    rows = [
+        {"file_instance_id": "I-1", "protection_class": "SOURCE_IMMUTABLE", "mime_type": "application/pdf", "original_relative_path": "a.pdf", "fixity_status": "HASHED_STABLE"},
+        {"file_instance_id": "I-2", "protection_class": "DERIVATIVE", "mime_type": "application/pdf", "original_relative_path": "b.pdf", "fixity_status": "HASHED_STABLE"},
+        {"file_instance_id": "I-3", "protection_class": "UNKNOWN", "mime_type": "text/plain", "original_relative_path": "c.txt", "fixity_status": "HASH_ERROR"},
+        {"file_instance_id": "I-4", "protection_class": "DERIVATIVE", "mime_type": "text/plain", "original_relative_path": "d.txt", "fixity_status": "HASHED_STABLE"},
+    ]
+    first = stratified_sample(rows, max_objects=3, run_seed="SEED-1")
+    second = stratified_sample(rows, max_objects=3, run_seed="SEED-1")
+    assert [r["file_instance_id"] for r in first] == [r["file_instance_id"] for r in second]
+    assert len({(r["protection_class"], r["mime_type"].split("/", 1)[0]) for r in first}) >= 2
 
 
 def test_name_is_deterministic():
