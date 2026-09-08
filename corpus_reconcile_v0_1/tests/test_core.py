@@ -1,6 +1,11 @@
+import hashlib
+import io
+import zipfile
+
 import pytest
 
 from corpus_reconcile.constants import ProtectionClass, TxAction, TxState
+from corpus_reconcile.email_parser import parse_eml
 from corpus_reconcile.email_relationships import reused_attachment_candidates
 from corpus_reconcile.identity import content_id_from_sha256, first_observation_file_instance_id
 from corpus_reconcile.inventory import inventory_local
@@ -139,11 +144,83 @@ def test_reused_attachment_candidate():
 
 
 def test_zip_manifest(tmp_path):
-    import zipfile
-
     path = tmp_path / "bundle.zip"
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr("a.txt", b"alpha")
         archive.writestr("nested/b.txt", b"beta")
     out = zip_manifest(path)
+    assert out["manifest_status"] == "MANIFESTED_STABLE"
+    assert out["fixity_status"] == "HASHED_STABLE"
     assert out["member_count"] == 2 and all(len(member["sha256"]) == 64 for member in out["members"])
+
+
+def test_eml_parser_binds_metadata_and_attachments_to_one_guarded_stream(monkeypatch, tmp_path):
+    raw = (
+        b"Message-ID: <stable@example.test>\r\n"
+        b"Date: Tue, 8 Sep 2026 00:00:00 -0700\r\n"
+        b"From: sender@example.test\r\n"
+        b"To: receiver@example.test\r\n"
+        b"Subject: Stable EML\r\n"
+        b"MIME-Version: 1.0\r\n"
+        b"Content-Type: multipart/mixed; boundary=BOUNDARY\r\n\r\n"
+        b"--BOUNDARY\r\nContent-Type: text/plain\r\n\r\nBody\r\n"
+        b"--BOUNDARY\r\nContent-Type: text/plain\r\n"
+        b"Content-Disposition: attachment; filename=test.txt\r\n\r\nalpha\r\n"
+        b"--BOUNDARY--\r\n"
+    )
+    sha = hashlib.sha256(raw).hexdigest()
+    sentinel = tmp_path / "mail.eml"
+    sentinel.write_bytes(b"different-on-disk-bytes")
+
+    def guarded(_path):
+        return {
+            "data": raw,
+            "sha256": sha,
+            "fixity_status": "HASHED_STABLE",
+            "hash_error": "",
+            "size_bytes_pre": len(raw),
+            "size_bytes_post": len(raw),
+            "mtime_ns_pre": 1,
+            "mtime_ns_post": 1,
+        }
+
+    monkeypatch.setattr("corpus_reconcile.email_parser.read_bytes_with_stat_guard", guarded)
+    out = parse_eml(sentinel)
+    assert out["parse_status"] == "PARSED_STABLE"
+    assert out["raw_mime_sha256"] == sha == out["sha256"]
+    assert out["message_id"] == "<stable@example.test>"
+    assert out["attachment_count"] == 1
+    assert out["attachments"][0]["sha256"] == hashlib.sha256(b"alpha").hexdigest()
+
+
+def test_zip_manifest_binds_members_to_one_guarded_stream(monkeypatch, tmp_path):
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("a.txt", b"alpha")
+        archive.writestr("b.txt", b"beta")
+    raw = buffer.getvalue()
+    sha = hashlib.sha256(raw).hexdigest()
+    sentinel = tmp_path / "bundle.zip"
+    sentinel.write_bytes(b"not-a-zip")
+
+    def guarded(_path):
+        return {
+            "data": raw,
+            "sha256": sha,
+            "fixity_status": "HASHED_STABLE",
+            "hash_error": "",
+            "size_bytes_pre": len(raw),
+            "size_bytes_post": len(raw),
+            "mtime_ns_pre": 1,
+            "mtime_ns_post": 1,
+        }
+
+    monkeypatch.setattr("corpus_reconcile.zip_manifest.read_bytes_with_stat_guard", guarded)
+    out = zip_manifest(sentinel)
+    assert out["manifest_status"] == "MANIFESTED_STABLE"
+    assert out["zip_sha256"] == sha
+    assert {m["name"] for m in out["members"]} == {"a.txt", "b.txt"}
+    assert {m["sha256"] for m in out["members"]} == {
+        hashlib.sha256(b"alpha").hexdigest(),
+        hashlib.sha256(b"beta").hexdigest(),
+    }
