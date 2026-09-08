@@ -5,9 +5,9 @@
 - The original pre-amendment v0.1 local regression suite executed successfully at 7/7 before the G0-G5 amendment.
 - The G0-G5 / identity amendment expanded the suite to 12 tests in v0.1.1.
 - GitHub Actions run `34199502357` for commit `95048fff43c9024bd4b9127251fed7088efb2485` completed successfully, including package installation, compile, and the corpus-reconcile regression-test step.
-- GitHub Actions run `34199654951` subsequently completed successfully on the accepted v0.1.1 current-head documentation state.
+- GitHub Actions run `34199654951` subsequently completed successfully on the accepted v0.1.1 state.
 
-These results are historical validation for v0.1.1 and do not substitute for validation of later code changes.
+These results remain historical context only and do not substitute for validation of a changed implementation.
 
 ## v0.1.2 iteration-2 delta
 
@@ -15,19 +15,32 @@ v0.1.2 adds guarded single-byte-stream handling for special parsers:
 
 - EML headers, raw MIME SHA-256, and attachment hashes are bound to one guarded byte observation.
 - ZIP container SHA-256 and member hashes are bound to one guarded byte observation.
-- The regression suite is expanded from 12 to 14 tests to cover those invariants.
+- The regression suite expanded from 12 to 14 tests to cover those invariants.
 
-## Current validation state
+## Accepted execution baseline
 
-The v0.1.2 implementation is **PENDING CURRENT-HEAD CI** until the existing `Control Plane CI` workflow completes successfully on the final v0.1.2 branch head.
+`EXECUTION_BASELINE_COMMIT = 77e0fe03d100830458068d770d2466e1b259d4b9`
 
-Do not direct Cowork to a v0.1.2 census until that current-head run succeeds. The previously validated v0.1.1 head remains the last validated execution baseline until then.
+GitHub Actions `Control Plane CI` run `34201155378` completed **SUCCESS** on that exact baseline. The job successfully completed package installation, corpus-reconcile compilation, the v0.1.2 regression-test step, sandbox regression tests, JSON-schema parsing, and the public-control-plane identifier guard.
 
-## Release gate after v0.1.2 CI success
+This commit is the pinned runtime target for the next Cowork census.
 
-Once current-head CI passes, the next authorized execution is still only the Cowork FULL-ROOT READ-ONLY census with explicit `ROOT_ID`, unique `RUN_ID`, parent-controlled `RUN_SEED`, and prior instance/sticky-protection registry.
+### Baseline-lock rule
 
-Cowork must preserve its configuration, implementation commit SHA, output directory, and generated manifests as run evidence. A local smoke re-run of the test suite is optional environment confirmation after GitHub CI passes.
+Execution consumers MUST pin the exact validated `EXECUTION_BASELINE_COMMIT`, not a floating branch name or later documentation-only head.
+
+A later branch commit does **not** supersede the execution baseline merely because it is newer. Promote a new execution baseline only when:
+
+1. implementation code, schemas, tests, packaging, or runtime behavior materially changes and the applicable CI gate passes; or
+2. the parent orchestrator explicitly promotes another already-validated implementation commit.
+
+Documentation-only or control-commentary commits may advance the branch without retargeting Cowork. This separates implementation validation from documentation chronology and prevents avoidable moving-target handoffs.
+
+## Current released action
+
+The next authorized execution remains only the Cowork **FULL-ROOT READ-ONLY census** using the pinned execution baseline above, with explicit `ROOT_ID`, unique `RUN_ID`, parent-controlled `RUN_SEED`, and prior instance/sticky-protection registry.
+
+Cowork must preserve its configuration, implementation commit SHA, output directory, and generated manifests as run evidence. A local smoke re-run of the test suite is optional environment confirmation, not a prerequisite.
 
 ## Required gate before mutation canary
 
