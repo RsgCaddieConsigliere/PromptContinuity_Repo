@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Source Review Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["review_id", "run_id", "source_set_id", "source_id", "review_role", "start_locator", "end_locator", "review_status"],
+  "properties": {
+    "review_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "source_set_id": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string", "minLength": 1},
+    "content_id": {"type": ["string", "null"]},
+    "review_role": {"type": "string", "minLength": 1},
+    "review_method": {"type": ["string", "null"]},
+    "start_locator": {"type": "string", "minLength": 1},
+    "end_locator": {"type": "string", "minLength": 1},
+    "pages_expected": {"type": ["integer", "null"], "minimum": 0},
+    "pages_reviewed": {"type": ["integer", "null"], "minimum": 0},
+    "chunks_expected": {"type": ["integer", "null"], "minimum": 0},
+    "chunks_reviewed": {"type": ["integer", "null"], "minimum": 0},
+    "truncation_detected": {"type": "boolean"},
+    "findings_created": {"type": "integer", "minimum": 0, "default": 0},
+    "errata_created": {"type": "integer", "minimum": 0, "default": 0},
+    "conflicts_created": {"type": "integer", "minimum": 0, "default": 0},
+    "adverse_items_created": {"type": "integer", "minimum": 0, "default": 0},
+    "gaps_created": {"type": "integer", "minimum": 0, "default": 0},
+    "review_status": {"type": "string", "enum": ["OPEN", "PARTIAL", "COMPLETE", "BLOCKED", "QA_REQUIRED"]}
+  }
+}
