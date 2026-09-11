@@ -1,0 +1,57 @@
+{
+  "required_columns": [
+    "SOURCE_REVIEW_ID",
+    "SOURCE_SET_ID",
+    "SOURCE_ID",
+    "ORIGINAL_FILENAME",
+    "SHA256",
+    "REVIEW_METHOD",
+    "REVIEW_STATUS",
+    "COVERAGE_STATUS",
+    "COVERAGE_LOCATORS",
+    "FINDINGS_DISPOSITION",
+    "ARCHIVE_DISPOSITION",
+    "REVIEW_RUN_ID"
+  ],
+  "allowed_review_status": [
+    "COMPLETE",
+    "PARTIAL",
+    "BLOCKED",
+    "INVENTORY_ONLY",
+    "EXACT_DUPLICATE_REVIEW_SKIPPED",
+    "ARCHIVE_SKIP_CONTENT",
+    "RESTRICTED_NOT_TRAVERSED",
+    "MISSING_SOURCE"
+  ],
+  "allowed_coverage_status": [
+    "FULL_TEXT",
+    "FULL_VISUAL",
+    "FULL_TEXT_PLUS_VISUAL",
+    "FULL_SHEETS_CELLS",
+    "BOUNDED_LOCATORS_ONLY",
+    "INVENTORY_ONLY",
+    "NOT_APPLICABLE"
+  ],
+  "allowed_archive_disposition": [
+    "REVIEW_COMPLETE_ARCHIVE_ELIGIBLE",
+    "REVIEW_COMPLETE_MOVE_NOT_AUTHORIZED",
+    "KEEP_ACTIVE",
+    "BLOCKED_PENDING_REVIEW",
+    "PRESERVE_ARCHIVE_SKIP_CONTENT",
+    "RESTRICTED_NOT_TRAVERSED",
+    "MISSING_SOURCE"
+  ],
+  "sha256_required_statuses": [
+    "COMPLETE",
+    "PARTIAL",
+    "INVENTORY_ONLY",
+    "EXACT_DUPLICATE_REVIEW_SKIPPED",
+    "ARCHIVE_SKIP_CONTENT"
+  ],
+  "full_coverage_statuses": [
+    "FULL_TEXT",
+    "FULL_VISUAL",
+    "FULL_TEXT_PLUS_VISUAL",
+    "FULL_SHEETS_CELLS"
+  ]
+}
