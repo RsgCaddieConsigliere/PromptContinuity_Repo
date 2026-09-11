@@ -4,12 +4,14 @@ on:
   push:
     paths:
       - 'automation/file_sandbox/**'
+      - 'automation/review_control/**'
       - 'schemas/**'
       - 'docs/**'
       - '.github/workflows/control-plane-ci.yml'
   pull_request:
     paths:
       - 'automation/file_sandbox/**'
+      - 'automation/review_control/**'
       - 'schemas/**'
       - 'docs/**'
       - '.github/workflows/control-plane-ci.yml'
@@ -31,9 +33,13 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile Python helpers
-        run: python -m compileall -q automation/file_sandbox
+        run: |
+          python -m compileall -q automation/file_sandbox
+          python -m compileall -q automation/review_control
       - name: Run sandbox regression tests
         run: python -m unittest discover -s automation/file_sandbox/tests -p 'test_*.py' -v
+      - name: Run review-control contract tests
+        run: python -m unittest discover -s automation/review_control/tests -p 'test_*.py' -v
       - name: Validate JSON schemas parse
         run: |
           python - <<'PY'
@@ -53,8 +59,8 @@ jobs:
           tracked = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
           text_suffixes = {'.md', '.txt', '.json', '.jsonl', '.yaml', '.yml', '.py', '.sh'}
           live_private_link = re.compile(
-              r'https://(?:drive\.google\.com/(?:file/d|drive/folders)/|'
-              r'docs\.google\.com/(?:document|spreadsheets|presentation)/d/)'
+              r'https://(?:drive\\.google\\.com/(?:file/d|drive/folders)/|'
+              r'docs\\.google\\.com/(?:document|spreadsheets|presentation)/d/)'
               r'[A-Za-z0-9_-]{20,}'
           )
           forbidden_suffixes = {'.pem', '.key', '.p12', '.pfx'}

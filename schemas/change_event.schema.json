@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Review Change Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["change_id", "run_id", "target_table", "target_record_id", "action", "rationale", "qa_status"],
+  "properties": {
+    "change_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "source_set_id": {"type": ["string", "null"]},
+    "target_table": {"type": "string", "minLength": 1},
+    "target_record_id": {"type": "string", "minLength": 1},
+    "target_field": {"type": ["string", "null"]},
+    "action": {"type": "string", "enum": ["ADD", "AMEND", "DEPRECATE", "RETRACT", "ERRATA", "CONFLICT_LINK", "ADVERSE_LINK", "VERIFY", "UNVERIFY", "PROMOTE_TO_EXHIBIT", "DEMOTE_FROM_EXHIBIT"]},
+    "old_value": {},
+    "new_value": {},
+    "rationale": {"type": "string", "minLength": 1},
+    "source_ids": {"type": "array", "items": {"type": "string"}},
+    "locators": {"type": "array", "items": {"type": "string"}},
+    "review_id": {"type": ["string", "null"]},
+    "qa_status": {"type": "string", "enum": ["PENDING", "PASS", "FAIL", "BLOCKED"]},
+    "supersedes_change_id": {"type": ["string", "null"]}
+  }
+}
