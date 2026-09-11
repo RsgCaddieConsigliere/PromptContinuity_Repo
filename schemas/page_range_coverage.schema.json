@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Page Range Coverage",
+  "type": "object",
+  "required": ["source_id", "start_locator", "end_locator", "coverage_status"],
+  "properties": {
+    "source_id": {"type": "string"},
+    "start_locator": {"type": "string"},
+    "end_locator": {"type": "string"},
+    "text_extracted": {"type": "boolean"},
+    "ocr_required": {"type": "boolean"},
+    "image_review_required": {"type": "boolean"},
+    "review_fact": {"type": "boolean"},
+    "review_adverse": {"type": "boolean"},
+    "review_conflict": {"type": "boolean"},
+    "qa_pass": {"type": "boolean"},
+    "coverage_status": {"type": "string", "enum": ["OPEN", "PARTIAL", "COMPLETE", "BLOCKED"]}
+  }
+}
