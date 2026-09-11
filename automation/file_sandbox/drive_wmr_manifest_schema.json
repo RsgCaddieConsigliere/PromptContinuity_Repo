@@ -1,0 +1,19 @@
+{
+  "required_columns": [
+    "ACTION_ID",
+    "BATCH_ID",
+    "ORIGINAL_PROVIDER_ID",
+    "ORIGINAL_PARENT_ID",
+    "ORIGINAL_NAME",
+    "COPY_INBOUND_PARENT_ID",
+    "COPY_FINAL_PARENT_ID",
+    "PROPOSED_FINAL_NAME",
+    "HITL_STATUS",
+    "EXECUTION_STATUS"
+  ],
+  "allowed_execution_status": ["NOT_STARTED", "PRECHECKED", "COPIED", "MOVED_RENAMED", "PASS", "FAILED", "BLOCKED"],
+  "allowed_hitl_status": ["PENDING", "APPROVED", "REJECTED"],
+  "forbidden_name_components": ["0000X-Files-Restricted", "99_ARCHIVE", "90_FIREWALLED", "IRS_ARCHIVED"],
+  "delete_allowed": false,
+  "source_mutation_authority": "NOT_GRANTED"
+}
